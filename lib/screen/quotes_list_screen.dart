@@ -35,8 +35,8 @@ class QuotesListScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final authRead = context.read<AuthProvider>();
-          final result = await authRead.logout();
-          if (result) onLogout();
+          await authRead.logout();
+          onLogout();
         },
         tooltip: 'Logout',
         child:
