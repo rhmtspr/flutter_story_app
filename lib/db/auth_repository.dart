@@ -1,50 +1,78 @@
-import 'package:declarative_navigation/model/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:declarative_navigation/model/user.dart';
+import '../services/api_service.dart';
 
 class AuthRepository {
+  final ApiService apiService;
+
+  AuthRepository(this.apiService);
+
   final String stateKey = 'state';
+  final String tokenKey = 'token';
   final String userKey = 'user';
 
-  Future<bool> isLoggedIn() async {
-    final preferences = await SharedPreferences.getInstance();
-    await Future.delayed(const Duration(seconds: 2));
-    return preferences.getBool(stateKey) ?? false;
+  /// =========================
+  /// REGISTER
+  /// =========================
+  Future<bool> register(User user, {required String name}) async {
+    await apiService.register(
+      name: name,
+      email: user.email!,
+      password: user.password!,
+    );
+    return true;
   }
 
-  Future<bool> login() async {
-    final preferences = await SharedPreferences.getInstance();
-    await Future.delayed(const Duration(seconds: 2));
-    return preferences.setBool(stateKey, true);
+  /// =========================
+  /// LOGIN
+  /// =========================
+  Future<bool> login(User user) async {
+    final result = await apiService.login(
+      email: user.email!,
+      password: user.password!,
+    );
+
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setBool(stateKey, true);
+    await prefs.setString(tokenKey, result['token']);
+    await prefs.setString(userKey, user.toJson());
+
+    return true;
   }
 
+  /// =========================
+  /// LOGOUT
+  /// =========================
   Future<bool> logout() async {
-    final preferences = await SharedPreferences.getInstance();
-    await Future.delayed(const Duration(seconds: 2));
-    return preferences.setBool(stateKey, false);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    return true;
   }
 
-  Future<bool> saveUser(User user) async {
-    final preferences = await SharedPreferences.getInstance();
-    await Future.delayed(const Duration(seconds: 2));
-    return preferences.setString(userKey, user.toJson());
+  /// =========================
+  /// CHECK LOGIN
+  /// =========================
+  Future<bool> isLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(stateKey) ?? false;
   }
 
-  Future<bool> deleteUser() async {
-    final preferences = await SharedPreferences.getInstance();
-    await Future.delayed(const Duration(seconds: 2));
-    return preferences.setString(userKey, "");
+  /// =========================
+  /// GET TOKEN
+  /// =========================
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(tokenKey);
   }
 
+  /// =========================
+  /// GET USER
+  /// =========================
   Future<User?> getUser() async {
-    final preferences = await SharedPreferences.getInstance();
-    await Future.delayed(const Duration(seconds: 2));
-    final json = preferences.getString(userKey) ?? "";
-    User? user;
-    try {
-      user = User.fromJson(json);
-    } catch (e) {
-      user = null;
-    }
-    return user;
+    final prefs = await SharedPreferences.getInstance();
+    final json = prefs.getString(userKey);
+    if (json == null) return null;
+    return User.fromJson(json);
   }
 }
