@@ -18,12 +18,14 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
+    nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -41,6 +43,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Name
+                TextFormField(
+                  controller: nameController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your name.';
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(hintText: "Name"),
+                ),
+                const SizedBox(height: 8),
+
+                // Email
                 TextFormField(
                   controller: emailController,
                   validator: (value) {
@@ -52,6 +68,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: const InputDecoration(hintText: "Email"),
                 ),
                 const SizedBox(height: 8),
+
+                // Password
                 TextFormField(
                   controller: passwordController,
                   obscureText: true,
@@ -75,7 +93,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           );
                           final authRead = context.read<AuthProvider>();
 
-                          final result = await authRead.saveUser(user);
+                          final result = await authRead.register(
+                            user,
+                            nameController.text,
+                          );
                           if (result) widget.onRegister();
                         }
                       },
