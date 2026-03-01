@@ -1,6 +1,7 @@
 import 'package:declarative_navigation/db/auth_repository.dart';
 import 'package:declarative_navigation/provider/auth_provider.dart';
 import 'package:declarative_navigation/routers/router_delegate.dart';
+import 'package:declarative_navigation/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,7 +23,8 @@ class _QuotesAppState extends State<QuotesApp> {
   @override
   void initState() {
     super.initState();
-    final authRepository = AuthRepository();
+    final apiService = ApiService();
+    final authRepository = AuthRepository(apiService);
     authProvider = AuthProvider(authRepository);
     myRouterDelegate = MyRouterDelegate(authRepository);
   }
