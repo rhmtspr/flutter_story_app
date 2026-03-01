@@ -1,5 +1,8 @@
+import 'package:declarative_navigation/db/auth_repository.dart';
+import 'package:declarative_navigation/provider/auth_provider.dart';
 import 'package:declarative_navigation/routers/router_delegate.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const QuotesApp());
@@ -14,20 +17,26 @@ class QuotesApp extends StatefulWidget {
 
 class _QuotesAppState extends State<QuotesApp> {
   late MyRouterDelegate myRouterDelegate;
+  late AuthProvider authProvider;
 
   @override
   void initState() {
     super.initState();
-    myRouterDelegate = MyRouterDelegate();
+    final authRepository = AuthRepository();
+    authProvider = AuthProvider(authRepository);
+    myRouterDelegate = MyRouterDelegate(authRepository);
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Quotes App',
-      home: Router(
-        routerDelegate: myRouterDelegate,
-        backButtonDispatcher: RootBackButtonDispatcher(),
+    return ChangeNotifierProvider(
+      create: (context) => authProvider,
+      child: MaterialApp(
+        title: 'Quotes App',
+        home: Router(
+          routerDelegate: myRouterDelegate,
+          backButtonDispatcher: RootBackButtonDispatcher(),
+        ),
       ),
     );
   }
