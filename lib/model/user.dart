@@ -27,7 +27,4 @@ class User {
 
     return other is User && other.email == email && other.password == password;
   }
-
-  @override
-  int get hashCode => Object.hash(email, password);
 }
