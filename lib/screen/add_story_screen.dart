@@ -15,35 +15,74 @@ class AddStoryPage extends StatefulWidget {
 }
 
 class _AddStoryPageState extends State<AddStoryPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _descriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Add Story')),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            context.watch<HomeProvider>().imagePath == null
-                ? const Align(
-                  alignment: Alignment.center,
-                  child: Icon(Icons.image, size: 100),
-                )
-                : _showImage(),
-            ElevatedButton(
-              onPressed: () => _onGalleryView(),
-              child: const Text('Gallery'),
-            ),
-            ElevatedButton(
-              onPressed: () => _onCameraView(),
-              child: const Text('Camera'),
-            ),
-            ElevatedButton(
-              onPressed: () => _onUpload(),
-              child:
-                  context.watch<StoryProvider>().isUploading
-                      ? const CircularProgressIndicator(color: Colors.black)
-                      : const Text('Upload'),
-            ),
-          ],
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // Image Preview
+              context.watch<HomeProvider>().imagePath == null
+                  ? const Align(
+                    alignment: Alignment.center,
+                    child: Icon(Icons.image, size: 100),
+                  )
+                  : _showImage(),
+
+              // Description Field
+              TextFormField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Description cannot be empty';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              ElevatedButton(
+                onPressed: () => _onGalleryView(),
+                child: const Text('Gallery'),
+              ),
+              ElevatedButton(
+                onPressed: () => _onCameraView(),
+                child: const Text('Camera'),
+              ),
+
+              const SizedBox(height: 16),
+
+              ElevatedButton(
+                onPressed:
+                    context.watch<StoryProvider>().isUploading
+                        ? null
+                        : _onUpload,
+                child:
+                    context.watch<StoryProvider>().isUploading
+                        ? const CircularProgressIndicator(color: Colors.black)
+                        : const Text('Upload'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -61,18 +100,18 @@ class _AddStoryPageState extends State<AddStoryPage> {
 
     final fileName = imageFile.name;
     final bytes = await imageFile.readAsBytes();
-
     final newBytes = await storyProvider.compressImage(bytes);
 
     await storyProvider.uploadStory(
       bytes: newBytes,
       fileName: fileName,
-      description: 'Description',
+      description: _descriptionController.text,
     );
 
     if (storyProvider.uploadResponse != null) {
       homeProvider.setImageFile(null);
       homeProvider.setImagePath(null);
+      _descriptionController.clear();
     }
 
     scaffoldMessengerState.showSnackBar(
