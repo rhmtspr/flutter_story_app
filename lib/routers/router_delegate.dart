@@ -1,5 +1,6 @@
 import 'package:declarative_navigation/db/auth_repository.dart';
 import 'package:declarative_navigation/model/quote.dart';
+import 'package:declarative_navigation/screen/add_story_screen.dart';
 import 'package:declarative_navigation/screen/login_screen.dart';
 import 'package:declarative_navigation/screen/quote_detail_screen.dart';
 import 'package:declarative_navigation/screen/quotes_list_screen.dart';
@@ -21,6 +22,8 @@ class MyRouterDelegate extends RouterDelegate
     isLoggedIn = await authRepository.isLoggedIn();
     notifyListeners();
   }
+
+  bool isAddingStory = false;
 
   List<Page> get _splashStack => const [
     MaterialPage(key: ValueKey('SplashPage'), child: SplashScreen()),
@@ -69,6 +72,10 @@ class MyRouterDelegate extends RouterDelegate
           isLoggedIn = false;
           notifyListeners();
         },
+        onAddStory: () {
+          isAddingStory = true;
+          notifyListeners();
+        },
       ),
     ),
     if (selectedQuote != null)
@@ -76,6 +83,8 @@ class MyRouterDelegate extends RouterDelegate
         key: ValueKey(selectedQuote),
         child: QuoteDetailsScreen(quoteId: selectedQuote!),
       ),
+    if (isAddingStory)
+      const MaterialPage(key: ValueKey('AddStoryPage'), child: AddStoryPage()),
   ];
 
   @override
@@ -106,6 +115,10 @@ class MyRouterDelegate extends RouterDelegate
         }
         if (page.key == const ValueKey('RegisterPage')) {
           isRegister = false;
+          notifyListeners();
+        }
+        if (page.key == const ValueKey('AddStoryPage')) {
+          isAddingStory = false;
           notifyListeners();
         }
       },
