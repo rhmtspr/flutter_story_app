@@ -8,19 +8,37 @@ class QuotesListScreen extends StatelessWidget {
   final List<Quote> quotes;
   final Function(String) onTapped;
   final Function() onLogout;
+  final Function() onAddStory;
 
   const QuotesListScreen({
     Key? key,
     required this.quotes,
     required this.onTapped,
     required this.onLogout,
+    required this.onAddStory,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final authWatch = context.watch<AuthProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text("Quotes App")),
+      appBar: AppBar(
+        title: const Text("Quotes App"),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final authRead = context.read<AuthProvider>();
+              await authRead.logout();
+              onLogout();
+            },
+            tooltip: 'Logout',
+            icon:
+                authWatch.isLoadingLogout
+                    ? const CircularProgressIndicator(color: Colors.blue)
+                    : const Icon(Icons.logout),
+          ),
+        ],
+      ),
       body: ListView(
         children: [
           for (var quote in quotes)
@@ -33,16 +51,8 @@ class QuotesListScreen extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final authRead = context.read<AuthProvider>();
-          await authRead.logout();
-          onLogout();
-        },
-        tooltip: 'Logout',
-        child:
-            authWatch.isLoadingLogout
-                ? const CircularProgressIndicator(color: Colors.white)
-                : const Icon(Icons.logout),
+        onPressed: () => onAddStory(),
+        child: const Icon(Icons.add),
       ),
     );
   }
