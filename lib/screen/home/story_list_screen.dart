@@ -98,9 +98,7 @@ class _ListStoryScreenState extends State<ListStoryScreen> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: StoryCard(
                       name: story.name,
-                      description: story.description,
                       photoUrl: story.photoUrl,
-                      createdAt: story.createdAt,
                       onTap: () => widget.onTapped(story.id),
                     ),
                   );
