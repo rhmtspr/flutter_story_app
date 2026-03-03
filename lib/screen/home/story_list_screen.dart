@@ -1,8 +1,8 @@
 import 'dart:async';
-
 import 'package:declarative_navigation/provider/auth_provider.dart';
 import 'package:declarative_navigation/provider/list_story_provider.dart';
 import 'package:declarative_navigation/provider/list_story_result_state.dart';
+import 'package:declarative_navigation/widgets/story_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -35,68 +35,88 @@ class _ListStoryScreenState extends State<ListStoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authWatch = context.watch<AuthProvider>();
+    final authProvider = context.watch<AuthProvider>();
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F9FC), // flat soft background
       appBar: AppBar(
         title: const Text('Stories'),
         centerTitle: true,
+        elevation: 0, // flat
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
         actions: [
           IconButton(
-            onPressed: () async {
-              final authRead = context.read<AuthProvider>();
-              await authRead.logout();
-              widget.onLogout();
-            },
-            tooltip: 'Logout',
+            tooltip: "Logout",
+            onPressed:
+                authProvider.isLoadingLogout
+                    ? null
+                    : () async {
+                      await context.read<AuthProvider>().logout();
+                      widget.onLogout();
+                    },
             icon:
-                authWatch.isLoadingLogout
-                    ? const CircularProgressIndicator(color: Colors.blue)
+                authProvider.isLoadingLogout
+                    ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                     : const Icon(Icons.logout),
           ),
         ],
       ),
       body: Consumer<ListStoryProvider>(
-        builder: (context, value, child) {
-          return switch (value.resultState) {
-            ListStoryLoadingState() => const _LoadingView(),
-            ListStoryLoadedState(data: var listStory) => RefreshIndicator(
+        builder: (context, provider, child) {
+          final state = provider.resultState;
+
+          if (state is ListStoryLoadingState) {
+            return const _LoadingView();
+          }
+
+          if (state is ListStoryErrorState) {
+            return _ErrorView(message: state.error, onRetry: _fetch);
+          }
+
+          if (state is ListStoryLoadedState) {
+            final stories = state.data;
+
+            if (stories.isEmpty) {
+              return const _EmptyView();
+            }
+
+            return RefreshIndicator(
               onRefresh: _fetch,
-              child:
-                  listStory.isEmpty
-                      ? const _EmptyView()
-                      : ListView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        children: [
-                          const SizedBox(height: 8),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: listStory.length,
-                            itemBuilder: (context, index) {
-                              final story = listStory[index];
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: stories.length,
+                itemBuilder: (context, index) {
+                  final story = stories[index];
 
-                              return ListTile(
-                                title: Text(story.name),
-                                onTap: () => widget.onTapped(story.id),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-            ),
-            ListStoryErrorState(error: var message) => _ErrorView(
-              message: message,
-              onRetry: _fetch,
-            ),
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: StoryCard(
+                      name: story.name,
+                      description: story.description,
+                      photoUrl: story.photoUrl,
+                      createdAt: story.createdAt,
+                      onTap: () => widget.onTapped(story.id),
+                    ),
+                  );
+                },
+              ),
+            );
+          }
 
-            _ => const SizedBox(),
-          };
+          return const SizedBox();
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => widget.onAddStory(),
-        child: const Icon(Icons.add),
+        elevation: 0,
+        backgroundColor: Colors.black,
+        onPressed: widget.onAddStory,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
