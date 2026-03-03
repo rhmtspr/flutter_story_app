@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:declarative_navigation/provider/camera_provider.dart';
+import 'package:declarative_navigation/provider/list_story_provider.dart';
 import 'package:declarative_navigation/provider/story_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -108,10 +109,18 @@ class _AddStoryPageState extends State<AddStoryPage> {
       description: _descriptionController.text,
     );
 
+    if (!mounted) return;
+
     if (storyProvider.uploadResponse != null) {
       homeProvider.setImageFile(null);
       homeProvider.setImagePath(null);
       _descriptionController.clear();
+
+      await context.read<ListStoryProvider>().fetchListStory();
+
+      if (mounted) {
+        Navigator.pop(context);
+      }
     }
 
     scaffoldMessengerState.showSnackBar(
