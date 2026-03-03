@@ -1,4 +1,4 @@
-import 'package:declarative_navigation/model/list_story.dart';
+import 'package:declarative_navigation/model/story.dart';
 
 class ListStoryResponse {
   final bool error;
