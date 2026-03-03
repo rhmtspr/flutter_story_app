@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:declarative_navigation/provider/auth_provider.dart';
 import 'package:declarative_navigation/provider/list_story_provider.dart';
 import 'package:declarative_navigation/provider/list_story_result_state.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +8,15 @@ import 'package:provider/provider.dart';
 
 class ListStoryScreen extends StatefulWidget {
   final Function(String) onTapped;
+  final Function() onLogout;
+  final Function() onAddStory;
 
-  const ListStoryScreen({super.key, required this.onTapped});
+  const ListStoryScreen({
+    super.key,
+    required this.onTapped,
+    required this.onLogout,
+    required this.onAddStory,
+  });
 
   @override
   State<ListStoryScreen> createState() => _ListStoryScreenState();
@@ -27,8 +35,27 @@ class _ListStoryScreenState extends State<ListStoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authWatch = context.watch<AuthProvider>();
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Stories'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Stories'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final authRead = context.read<AuthProvider>();
+              await authRead.logout();
+              widget.onLogout();
+            },
+            tooltip: 'Logout',
+            icon:
+                authWatch.isLoadingLogout
+                    ? const CircularProgressIndicator(color: Colors.blue)
+                    : const Icon(Icons.logout),
+          ),
+        ],
+      ),
       body: Consumer<ListStoryProvider>(
         builder: (context, value, child) {
           return switch (value.resultState) {
@@ -42,13 +69,6 @@ class _ListStoryScreenState extends State<ListStoryScreen> {
                         physics: const AlwaysScrollableScrollPhysics(),
                         children: [
                           const SizedBox(height: 8),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            child: Text('Discover Stories'),
-                          ),
                           ListView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
@@ -73,6 +93,10 @@ class _ListStoryScreenState extends State<ListStoryScreen> {
             _ => const SizedBox(),
           };
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => widget.onAddStory(),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -103,7 +127,7 @@ class _EmptyView extends StatelessWidget {
           children: [
             Icon(Icons.restaurant_menu, size: 48, color: colors.outline),
             const SizedBox(height: 12),
-            Text("No restaurants found", style: text.titleMedium),
+            Text("No stories found", style: text.titleMedium),
             const SizedBox(height: 6),
             Text(
               "Try refreshing or search something else",
