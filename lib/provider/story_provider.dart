@@ -46,6 +46,7 @@ class StoryProvider extends ChangeNotifier {
       );
 
       message = uploadResponse?.message ?? 'success';
+      isUploading = false;
       notifyListeners();
     } catch (e) {
       isUploading = false;
