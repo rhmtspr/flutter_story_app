@@ -2,6 +2,7 @@ import 'package:declarative_navigation/db/auth_repository.dart';
 import 'package:declarative_navigation/provider/auth_provider.dart';
 import 'package:declarative_navigation/provider/camera_provider.dart';
 import 'package:declarative_navigation/provider/list_story_provider.dart';
+import 'package:declarative_navigation/provider/story_detail_provider.dart';
 import 'package:declarative_navigation/provider/story_provider.dart';
 import 'package:declarative_navigation/routers/router_delegate.dart';
 import 'package:declarative_navigation/services/api_service.dart';
@@ -54,6 +55,9 @@ class _QuotesAppState extends State<QuotesApp> {
         ChangeNotifierProvider(create: (context) => HomeProvider()),
         ChangeNotifierProvider(
           create: (context) => ListStoryProvider(ApiService()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => StoryDetailProvider(ApiService()),
         ),
       ],
       child: MaterialApp(
