@@ -1,9 +1,9 @@
 import 'package:declarative_navigation/db/auth_repository.dart';
-import 'package:declarative_navigation/model/quote.dart';
 import 'package:declarative_navigation/screen/add_story_screen.dart';
+import 'package:declarative_navigation/screen/detail/story_detail_screen.dart';
+import 'package:declarative_navigation/screen/home/story_list_screen.dart';
 import 'package:declarative_navigation/screen/login_screen.dart';
 import 'package:declarative_navigation/screen/quote_detail_screen.dart';
-import 'package:declarative_navigation/screen/quotes_list_screen.dart';
 import 'package:declarative_navigation/screen/register_screen.dart';
 import 'package:declarative_navigation/screen/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -61,11 +61,10 @@ class MyRouterDelegate extends RouterDelegate
 
   List<Page> get _loggedInStack => [
     MaterialPage(
-      key: const ValueKey("QuotesListPage"),
-      child: QuotesListScreen(
-        quotes: quotes,
-        onTapped: (String quoteId) {
-          selectedQuote = quoteId;
+      key: const ValueKey('ListStoryScreen'),
+      child: ListStoryScreen(
+        onTapped: (String storyId) {
+          selectedStory = storyId;
           notifyListeners();
         },
         onLogout: () {
@@ -78,10 +77,10 @@ class MyRouterDelegate extends RouterDelegate
         },
       ),
     ),
-    if (selectedQuote != null)
+    if (selectedStory != null)
       MaterialPage(
-        key: ValueKey(selectedQuote),
-        child: QuoteDetailsScreen(quoteId: selectedQuote!),
+        key: ValueKey(selectedStory),
+        child: StoryDetailScreen(storyId: selectedStory!),
       ),
     if (isAddingStory)
       const MaterialPage(key: ValueKey('AddStoryPage'), child: AddStoryPage()),
@@ -90,7 +89,7 @@ class MyRouterDelegate extends RouterDelegate
   @override
   GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
 
-  String? selectedQuote;
+  String? selectedStory;
 
   List<Page> historyStack = [];
   bool? isLoggedIn;
@@ -109,8 +108,8 @@ class MyRouterDelegate extends RouterDelegate
       key: navigatorKey,
       pages: historyStack,
       onDidRemovePage: (page) {
-        if (page.key == ValueKey('QuoteDetailsPage-$selectedQuote')) {
-          selectedQuote = null;
+        if (page.key == ValueKey('StoryDetailPage-$selectedStory')) {
+          selectedStory = null;
           notifyListeners();
         }
         if (page.key == const ValueKey('RegisterPage')) {
