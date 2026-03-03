@@ -1,4 +1,4 @@
-import 'package:declarative_navigation/model/list_story.dart';
+import 'package:declarative_navigation/model/story.dart';
 
 sealed class ListStoryResultState {}
 
@@ -13,7 +13,7 @@ class ListStoryErrorState extends ListStoryResultState {
 }
 
 class ListStoryLoadedState extends ListStoryResultState {
-  final List<ListStory> data;
+  final List<Story> data;
 
   ListStoryLoadedState(this.data);
 }
