@@ -3,7 +3,7 @@ import 'package:declarative_navigation/model/list_story.dart';
 class ListStoryResponse {
   final bool error;
   final String message;
-  final List<ListStory> listStory;
+  final List<Story> listStory;
 
   ListStoryResponse({
     required this.error,
@@ -17,10 +17,10 @@ class ListStoryResponse {
       message: json['message'],
       listStory:
           json['listStory'] != null
-              ? List<ListStory>.from(
-                json['listStory']!.map((x) => ListStory.fromJson(x)),
+              ? List<Story>.from(
+                json['listStory']!.map((x) => Story.fromJson(x)),
               )
-              : <ListStory>[],
+              : <Story>[],
     );
   }
 }
