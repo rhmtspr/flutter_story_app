@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:declarative_navigation/model/list_story_response.dart';
+import 'package:declarative_navigation/model/story_detail_response.dart';
 import 'package:declarative_navigation/model/upload_response.dart';
 import 'package:http/http.dart' as http;
 
@@ -48,6 +50,9 @@ class ApiService {
     return data['loginResult']; // contains id, name, token
   }
 
+  /// =========================
+  /// UPLOAD STORY
+  /// =========================
   Future<UploadResponse> uploadStory({
     required List<int> bytes,
     required String fileName,
@@ -61,6 +66,7 @@ class ApiService {
     final request = http.MultipartRequest('POST', uri);
 
     /// Add Authorization Header ✅
+    request.headers['Content-Type'] = 'multipart/form-data';
     request.headers['Authorization'] = 'Bearer $token';
 
     /// Add fields
@@ -89,5 +95,43 @@ class ApiService {
     }
 
     return uploadResponse;
+  }
+
+  /// =========================
+  /// GET ALL STORIES
+  /// =========================
+  Future<ListStoryResponse> getListStory(String token) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/stories'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return ListStoryResponse.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to load story list.');
+    }
+  }
+
+  /// =========================
+  /// GET STORY DETAIL
+  /// =========================
+  Future<StoryDetailResponse> getStoryDetail(String id, String token) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/stories/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return StoryDetailResponse.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to load the story detail');
+    }
   }
 }
