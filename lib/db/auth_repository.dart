@@ -14,9 +14,9 @@ class AuthRepository {
   /// =========================
   /// REGISTER
   /// =========================
-  Future<bool> register(User user, {required String name}) async {
+  Future<bool> register(User user) async {
     await apiService.register(
-      name: name,
+      name: user.name!,
       email: user.email!,
       password: user.password!,
     );
