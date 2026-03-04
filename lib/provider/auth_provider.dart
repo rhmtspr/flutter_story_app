@@ -30,12 +30,12 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// REGISTER
-  Future<bool> register(User user, String name) async {
+  Future<bool> register(User user) async {
     isLoadingRegister = true;
     notifyListeners();
 
     try {
-      await authRepository.register(user, name: name);
+      await authRepository.register(user);
       isLoadingRegister = false;
       notifyListeners();
       return true;
