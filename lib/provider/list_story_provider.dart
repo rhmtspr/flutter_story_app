@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:declarative_navigation/provider/list_story_result_state.dart';
 import 'package:declarative_navigation/services/api_service.dart';
 import 'package:flutter/foundation.dart';
@@ -31,6 +33,11 @@ class ListStoryProvider extends ChangeNotifier {
         _resultState = ListStoryLoadedState(result.listStory);
         notifyListeners();
       }
+    } on SocketException {
+      _resultState = ListStoryErrorState(
+        'There is no internet connection. Please check your WI-FI or mobile data.',
+      );
+      notifyListeners();
     } on Exception catch (e) {
       _resultState = ListStoryErrorState(e.toString());
       notifyListeners();
