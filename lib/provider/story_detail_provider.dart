@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:declarative_navigation/provider/story_detail_result_state.dart';
 import 'package:declarative_navigation/services/api_service.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,11 @@ class StoryDetailProvider extends ChangeNotifier {
         _resultState = StoryDetailLoadedState(result.story);
         notifyListeners();
       }
+    } on SocketException {
+      _resultState = StoryDetailErrorState(
+        'There is no internet connection. Please check your WI-FI or mobile data.',
+      );
+      notifyListeners();
     } on Exception catch (e) {
       _resultState = StoryDetailErrorState(e.toString());
       notifyListeners();
