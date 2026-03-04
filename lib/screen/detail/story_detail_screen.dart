@@ -1,5 +1,6 @@
 import 'package:declarative_navigation/provider/story_detail_provider.dart';
 import 'package:declarative_navigation/provider/story_detail_result_state.dart';
+import 'package:declarative_navigation/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -39,7 +40,7 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
           final state = provider.resultState;
 
           if (state is StoryDetailLoadingState) {
-            return const _LoadingView();
+            return const LoadingView();
           }
 
           if (state is StoryDetailErrorState) {
@@ -100,15 +101,6 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
         },
       ),
     );
-  }
-}
-
-class _LoadingView extends StatelessWidget {
-  const _LoadingView();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: CircularProgressIndicator(strokeWidth: 2));
   }
 }
 
