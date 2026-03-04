@@ -3,7 +3,6 @@ import 'package:declarative_navigation/screen/add_story_screen.dart';
 import 'package:declarative_navigation/screen/detail/story_detail_screen.dart';
 import 'package:declarative_navigation/screen/home/story_list_screen.dart';
 import 'package:declarative_navigation/screen/login_screen.dart';
-import 'package:declarative_navigation/screen/quote_detail_screen.dart';
 import 'package:declarative_navigation/screen/register_screen.dart';
 import 'package:declarative_navigation/screen/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -124,13 +123,8 @@ class MyRouterDelegate extends RouterDelegate
     );
   }
 
-  // @override
-  // // TODO: implement navigatorKey
-  // GlobalKey<NavigatorState>? get navigatorKey => throw UnimplementedError();
-
   @override
   Future<void> setNewRoutePath(configuration) {
-    // TODO: implement setNewRoutePath
     throw UnimplementedError();
   }
 }
