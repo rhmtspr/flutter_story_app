@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:declarative_navigation/provider/auth_provider.dart';
 import 'package:declarative_navigation/provider/list_story_provider.dart';
 import 'package:declarative_navigation/provider/list_story_result_state.dart';
+import 'package:declarative_navigation/widgets/empty_view.dart';
+import 'package:declarative_navigation/widgets/error_view.dart';
+import 'package:declarative_navigation/widgets/loading_view.dart';
 import 'package:declarative_navigation/widgets/story_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -71,18 +74,18 @@ class _ListStoryScreenState extends State<ListStoryScreen> {
           final state = provider.resultState;
 
           if (state is ListStoryLoadingState) {
-            return const _LoadingView();
+            return const LoadingView();
           }
 
           if (state is ListStoryErrorState) {
-            return _ErrorView(message: state.error, onRetry: _fetch);
+            return ErrorView(message: state.error, onRetry: _fetch);
           }
 
           if (state is ListStoryLoadedState) {
             final stories = state.data;
 
             if (stories.isEmpty) {
-              return const _EmptyView();
+              return const EmptyView();
             }
 
             return RefreshIndicator(
@@ -115,72 +118,6 @@ class _ListStoryScreenState extends State<ListStoryScreen> {
         backgroundColor: Colors.black,
         onPressed: widget.onAddStory,
         child: const Icon(Icons.add, color: Colors.white),
-      ),
-    );
-  }
-}
-
-class _LoadingView extends StatelessWidget {
-  const _LoadingView();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: CircularProgressIndicator());
-  }
-}
-
-class _EmptyView extends StatelessWidget {
-  const _EmptyView();
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final text = Theme.of(context).textTheme;
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.restaurant_menu, size: 48, color: colors.outline),
-            const SizedBox(height: 12),
-            Text("No stories found", style: text.titleMedium),
-            const SizedBox(height: 6),
-            Text(
-              "Try refreshing or search something else",
-              style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ErrorView extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-
-  const _ErrorView({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: colors.error),
-            const SizedBox(height: 12),
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: 12),
-            FilledButton(onPressed: onRetry, child: const Text("Try again")),
-          ],
-        ),
       ),
     );
   }
