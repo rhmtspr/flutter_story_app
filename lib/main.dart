@@ -6,6 +6,7 @@ import 'package:declarative_navigation/provider/story_detail_provider.dart';
 import 'package:declarative_navigation/provider/story_provider.dart';
 import 'package:declarative_navigation/routers/router_delegate.dart';
 import 'package:declarative_navigation/services/api_service.dart';
+import 'package:declarative_navigation/styles/theme/story_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -62,6 +63,9 @@ class _QuotesAppState extends State<QuotesApp> {
       ],
       child: MaterialApp(
         title: 'Quotes App',
+        theme: StoryTheme.lightTheme,
+        darkTheme: StoryTheme.darkTheme,
+        themeMode: ThemeMode.system,
         home: Router(
           routerDelegate: myRouterDelegate,
           backButtonDispatcher: RootBackButtonDispatcher(),
