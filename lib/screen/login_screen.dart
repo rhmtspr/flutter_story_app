@@ -48,7 +48,6 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// TITLE
                   const Text(
                     "Welcome Back",
                     style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
@@ -61,7 +60,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 32),
 
-                  /// EMAIL
                   const Text(
                     "Email",
                     style: TextStyle(fontWeight: FontWeight.w600),
@@ -84,7 +82,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 20),
 
-                  /// PASSWORD
                   const Text(
                     "Password",
                     style: TextStyle(fontWeight: FontWeight.w600),
@@ -119,7 +116,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 32),
 
-                  /// LOGIN BUTTON
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -153,7 +149,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 16),
 
-                  /// REGISTER BUTTON
                   Center(
                     child: TextButton(
                       onPressed: widget.onRegister,
