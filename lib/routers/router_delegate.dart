@@ -1,16 +1,21 @@
+import 'package:camera/camera.dart';
 import 'package:declarative_navigation/db/auth_repository.dart';
+import 'package:declarative_navigation/provider/camera_provider.dart';
 import 'package:declarative_navigation/screen/add_story_screen.dart';
+import 'package:declarative_navigation/screen/camera_screen.dart';
 import 'package:declarative_navigation/screen/detail/story_detail_screen.dart';
 import 'package:declarative_navigation/screen/home/story_list_screen.dart';
 import 'package:declarative_navigation/screen/login_screen.dart';
 import 'package:declarative_navigation/screen/register_screen.dart';
 import 'package:declarative_navigation/screen/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MyRouterDelegate extends RouterDelegate
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   final GlobalKey<NavigatorState> _navigatorKey;
   final AuthRepository authRepository;
+  List<CameraDescription> cameras = [];
 
   MyRouterDelegate(this.authRepository)
     : _navigatorKey = GlobalKey<NavigatorState>() {
@@ -19,10 +24,12 @@ class MyRouterDelegate extends RouterDelegate
 
   _init() async {
     isLoggedIn = await authRepository.isLoggedIn();
+    cameras = await availableCameras();
     notifyListeners();
   }
 
   bool isAddingStory = false;
+  bool isTakingPicture = false;
 
   List<Page> get _splashStack => const [
     MaterialPage(key: ValueKey('SplashPage'), child: SplashScreen()),
@@ -78,11 +85,38 @@ class MyRouterDelegate extends RouterDelegate
     ),
     if (selectedStory != null)
       MaterialPage(
-        key: ValueKey(selectedStory),
+        key: ValueKey('StoryDetailPage-$selectedStory'),
         child: StoryDetailScreen(storyId: selectedStory!),
       ),
     if (isAddingStory)
-      const MaterialPage(key: ValueKey('AddStoryPage'), child: AddStoryPage()),
+      MaterialPage(
+        key: const ValueKey('AddStoryPage'),
+        child: AddStoryPage(
+          onUploadSuccess: () {
+            isAddingStory = false;
+            notifyListeners();
+          },
+          onCameraOpened: () {
+            isTakingPicture = true;
+            notifyListeners();
+          },
+        ),
+      ),
+    if (isTakingPicture)
+      MaterialPage(
+        key: const ValueKey('CameraPage'),
+        child: CameraScreen(
+          cameras: cameras,
+          onPictureTaken: (XFile image) {
+            final homeProvider =
+                _navigatorKey.currentContext!.read<HomeProvider>();
+            homeProvider.setImageFile(image);
+            homeProvider.setImagePath(image.path);
+            isTakingPicture = false;
+            notifyListeners();
+          },
+        ),
+      ),
   ];
 
   @override
@@ -117,6 +151,10 @@ class MyRouterDelegate extends RouterDelegate
         }
         if (page.key == const ValueKey('AddStoryPage')) {
           isAddingStory = false;
+          notifyListeners();
+        }
+        if (page.key == const ValueKey('CameraPage')) {
+          isTakingPicture = false;
           notifyListeners();
         }
       },
