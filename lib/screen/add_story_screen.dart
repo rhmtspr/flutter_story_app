@@ -9,7 +9,13 @@ import '../provider/list_story_provider.dart';
 import '../provider/story_provider.dart';
 
 class AddStoryPage extends StatefulWidget {
-  const AddStoryPage({super.key});
+  final Function() onUploadSuccess;
+  final Function() onCameraOpened;
+  const AddStoryPage({
+    super.key,
+    required this.onCameraOpened,
+    required this.onUploadSuccess,
+  });
 
   @override
   State<AddStoryPage> createState() => _AddStoryPageState();
@@ -46,12 +52,10 @@ class _AddStoryPageState extends State<AddStoryPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// IMAGE PREVIEW
               ImagePreview(imagePath: homeProvider.imagePath),
 
               const SizedBox(height: 24),
 
-              /// DESCRIPTION
               const Text(
                 "Description",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -80,7 +84,6 @@ class _AddStoryPageState extends State<AddStoryPage> {
 
               const SizedBox(height: 24),
 
-              /// PICK IMAGE BUTTONS
               Row(
                 children: [
                   Expanded(
@@ -117,7 +120,6 @@ class _AddStoryPageState extends State<AddStoryPage> {
 
               const SizedBox(height: 32),
 
-              /// UPLOAD BUTTON
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -154,22 +156,18 @@ class _AddStoryPageState extends State<AddStoryPage> {
     );
   }
 
-  /// ===============================
-  /// Upload Logic (Cleaner)
-  /// ===============================
   Future<void> _onUpload() async {
     if (!_formKey.currentState!.validate()) return;
 
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final storyProvider = context.read<StoryProvider>();
     final homeProvider = context.read<HomeProvider>();
+    final listProvider = context.read<ListStoryProvider>();
 
-    final imagePath = homeProvider.imagePath;
     final imageFile = homeProvider.imageFile;
-
-    if (imagePath == null || imageFile == null) {
+    if (imageFile == null) {
       scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text("Please select an image first")),
+        const SnackBar(content: Text('Please select an image first')),
       );
       return;
     }
@@ -195,15 +193,12 @@ class _AddStoryPageState extends State<AddStoryPage> {
       homeProvider.setImagePath(null);
       _descriptionController.clear();
 
-      await context.read<ListStoryProvider>().fetchListStory();
+      await listProvider.fetchListStory();
 
-      if (mounted) Navigator.pop(context);
+      if (mounted) widget.onUploadSuccess();
     }
   }
 
-  /// ===============================
-  /// Pick from Gallery
-  /// ===============================
   Future<void> _onGalleryView() async {
     final provider = context.read<HomeProvider>();
 
@@ -220,23 +215,22 @@ class _AddStoryPageState extends State<AddStoryPage> {
     }
   }
 
-  /// ===============================
-  /// Pick from Camera
-  /// ===============================
   Future<void> _onCameraView() async {
     final provider = context.read<HomeProvider>();
 
     final isAndroid = defaultTargetPlatform == TargetPlatform.android;
     final isiOS = defaultTargetPlatform == TargetPlatform.iOS;
-    final isNotMobile = !(isAndroid || isiOS);
-    if (isNotMobile) return;
 
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if (isAndroid || isiOS) {
+      widget.onCameraOpened();
+    } else {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
-    if (pickedFile != null) {
-      provider.setImageFile(pickedFile);
-      provider.setImagePath(pickedFile.path);
+      if (pickedFile != null) {
+        provider.setImageFile(pickedFile);
+        provider.setImagePath(pickedFile.path);
+      }
     }
   }
 }
