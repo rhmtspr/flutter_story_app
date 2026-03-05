@@ -56,6 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
 
     final result = await authProvider.register(user);
+    if (!context.mounted) return;
 
     if (result) {
       widget.onRegister();
