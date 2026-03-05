@@ -1,8 +1,14 @@
 import 'package:camera/camera.dart';
+import 'package:declarative_navigation/utils/app_error_handler.dart';
 import 'package:flutter/material.dart';
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({super.key, required this.cameras});
+  final Function(XFile) onPictureTaken;
+  const CameraScreen({
+    super.key,
+    required this.cameras,
+    required this.onPictureTaken,
+  });
 
   final List<CameraDescription> cameras;
 
@@ -30,7 +36,14 @@ class _CameraScreenState extends State<CameraScreen>
     try {
       await cameraController.initialize();
     } on CameraException catch (e) {
-      print('Error initializing camera: $e');
+      if (!mounted) return;
+
+      AppErrorHandler.handleError(
+        context: context,
+        message: 'Failed to initialize camera: ${e.description}',
+        error: e,
+        name: 'CameraInit',
+      );
     }
 
     if (mounted) {
@@ -62,16 +75,13 @@ class _CameraScreenState extends State<CameraScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final CameraController? cameraController = controller;
 
-    // App state changed before we got the chance to initialize.
     if (cameraController == null || !cameraController.value.isInitialized) {
       return;
     }
 
     if (state == AppLifecycleState.inactive) {
-      // Free up memory when camera not active
       cameraController.dispose();
     } else if (state == AppLifecycleState.resumed) {
-      // Reinitialize the camera with same properties
       onNewCameraSelected(cameraController.description);
     }
   }
@@ -118,10 +128,11 @@ class _CameraScreenState extends State<CameraScreen>
   }
 
   Future<void> _onCameraButtonClick() async {
-    final navigator = Navigator.of(context);
     final image = await controller?.takePicture();
 
-    navigator.pop(image);
+    if (image != null) {
+      widget.onPictureTaken(image);
+    }
   }
 
   void _onCameraSwitch() {
