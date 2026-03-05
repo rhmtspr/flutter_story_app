@@ -41,13 +41,9 @@ class _ListStoryScreenState extends State<ListStoryScreen> {
     final authProvider = context.watch<AuthProvider>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FC), // flat soft background
       appBar: AppBar(
         title: const Text('Stories'),
         centerTitle: true,
-        elevation: 0, // flat
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
         actions: [
           IconButton(
             tooltip: "Logout",
