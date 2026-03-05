@@ -27,14 +27,7 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FC), // flat background
-      appBar: AppBar(
-        title: const Text('Story Detail'),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-      ),
+      appBar: AppBar(title: const Text('Story Detail'), centerTitle: true),
       body: Consumer<StoryDetailProvider>(
         builder: (context, provider, child) {
           final state = provider.resultState;
@@ -128,9 +121,6 @@ class _ErrorView extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                elevation: 0,
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 12,
