@@ -8,14 +8,18 @@ class User {
   User({this.name, this.email, this.password});
 
   @override
-  String toString() => 'User(email: $email, password: $password)';
+  String toString() => 'User(name: $name, email: $email, password: $password)';
 
   Map<String, dynamic> toMap() {
-    return {'email': email, 'password': password};
+    return {'name': name, 'email': email, 'password': password};
   }
 
   factory User.fromMap(Map<String, dynamic> map) {
-    return User(email: map['email'], password: map['password']);
+    return User(
+      name: map['name'],
+      email: map['email'],
+      password: map['password'],
+    );
   }
 
   String toJson() => json.encode(toMap());
@@ -26,6 +30,12 @@ class User {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is User && other.email == email && other.password == password;
+    return other is User &&
+        other.name == name &&
+        other.email == email &&
+        other.password == password;
   }
+
+  @override
+  int get hashCode => Object.hash(name, email, password);
 }
